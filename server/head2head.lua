@@ -154,11 +154,11 @@ startRaceInternal = function(raceId)
         return
     end
     activeRaces[raceId].started = false
-    for citizenId, racer in pairs(activeRaces[raceId].racers) do
+    for _, racer in pairs(activeRaces[raceId].racers) do
         if useDebug then
             print('racer', json.encode(racer, {indent=true}))
         end
-        local playerSource = getSrcOfPlayerByCitizenId(racer.citizenId)
+        local playerSource = racer.source
         if playerSource ~= nil then
             if useDebug then
                 print('pinging player', playerSource)
