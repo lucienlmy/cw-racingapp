@@ -188,6 +188,7 @@ local function inviteNearbyPlayers(raceId, amount)
         local otherPed = GetPlayerPed(playerId)
         local otherPlayerCoords = GetEntityCoords(otherPed)
         if playerPed ~= otherPed and isPlayerNearby(playerCoords, otherPlayerCoords, ConfigH2H.InviteDistance) then
+            DebugLog(string.format('^2[H2H] Inviting player^0 %s (%d)', playerId, 'with server id', GetPlayerServerId(playerId)))
             TriggerServerEvent('cw-racingapp:h2h:server:invitePlayer', GetPlayerServerId(playerId), raceId, amount, CurrentUserData?.racername or 'UNKNOWN')
             nearbyPlayersFound = true
         end
