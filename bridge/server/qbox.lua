@@ -36,10 +36,23 @@ end
 -- Fetches the CitizenId by Source
 function getCitizenId(src)
     local player = exports.qbx_core:GetPlayer(tonumber(src))
+    if not player then
+        print('^1[ERROR][cw-racingapp] getCitizenId: qbx_core:GetPlayer returned nil for src: ' .. tostring(src) .. '^0')
+        return nil
+    end
     return player.PlayerData.citizenid
 end
 
 -- Fetches the Source of an online player by citizenid
 function getSrcOfPlayerByCitizenId(citizenId)
-    return exports.qbx_core:GetPlayerByCitizenId(citizenId).PlayerData.source
+    if not citizenId then
+        print('^1[ERROR][cw-racingapp] getSrcOfPlayerByCitizenId: citizenId is nil^0')
+        return nil
+    end
+    local player = exports.qbx_core:GetPlayerByCitizenId(citizenId)
+    if not player then
+        print('^3[WARN][cw-racingapp] getSrcOfPlayerByCitizenId: no online player found for citizenId: ' .. tostring(citizenId) .. '^0')
+        return nil
+    end
+    return player.PlayerData.source
 end
