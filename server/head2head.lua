@@ -66,13 +66,19 @@ local function isRaceOrganizer(raceId, src)
 end
 
 local function getSourceRacerIdentity(src)
+
+    if useDebug then print('Getting identity for source', src) end
+
     local citizenId = getCitizenId(src)
     if not citizenId then
+        if useDebug then print('^1 [H2H] WARNING: No citizenId found for source '.. src ..'^0') end
         return nil
     end
 
     local raceUser = RADB.getActiveRacerName(citizenId)
     local racerName = raceUser and raceUser.racername or ''
+
+    if useDebug then print('Found identity for source', src, 'citizenId:', citizenId, 'racerName:', racerName) end
 
     return {
         citizenId = citizenId,
@@ -86,7 +92,7 @@ local startRaceInternal
 local function handleTimeout(raceId)
     SetTimeout(Config.RaceResetTimer, function()
         if activeRaces[raceId] then
-            if useDebug then print('Cleaning up '.. raceId..' due to inactivit') end
+            if useDebug then print('Cleaning up '.. raceId..' due to inactivity') end
             resetRace(raceId)
         end
     end)
@@ -100,9 +106,17 @@ RegisterNetEvent('cw-racingapp:h2h:server:leaveRace', function(raceId)
     resetRace(raceId)
 end)
 
-RegisterNetEvent('cw-racingapp:h2h:server:setupRace', function(citizenId, racerName, startCoords, amount, waypoint)
-    local identity = getSourceRacerIdentity(source)
+RegisterNetEvent('cw-racingapp:h2h:server:setupRace', function(startCoords, amount)
+    local src = source
+
+    if not src then
+        print('^1 [H2H] WARNING: No source found for H2H setup^0')
+        return
+    end
+
+    local identity = getSourceRacerIdentity(src)
     if not identity then
+        if useDebug then print('^1 [H2H] WARNING: No identity found for source '.. src ..' during H2H setup^0') end
         return
     end
 
@@ -127,17 +141,18 @@ RegisterNetEvent('cw-racingapp:h2h:server:setupRace', function(citizenId, racerN
         if ConfigH2H.SoloRace then
             startRaceInternal(raceId) -- Used for debugging
         else
-            TriggerClientEvent('cw-racingapp:h2h:client:checkDistance', source, raceId, amount)
+            TriggerClientEvent('cw-racingapp:h2h:client:checkDistance', src, raceId, amount)
         end
         handleTimeout(raceId)
     else
-        TriggerClientEvent('cw-racingapp:client:notify', source, Lang("error.failed_to_find_a_waypoint"), "error")
+        TriggerClientEvent('cw-racingapp:client:notify', src, Lang("error.failed_to_find_a_waypoint"), "error")
     end
 end)
 
 RegisterNetEvent('cw-racingapp:h2h:server:invitePlayer', function(sourceToInvite, raceId, amount, racerName)
     local raceData = activeRaces[raceId]
-    if not raceData or not isRaceOrganizer(raceId, source) or raceData.started then
+    local src = source
+    if not raceData or not isRaceOrganizer(raceId, src) or raceData.started then
         return
     end
 

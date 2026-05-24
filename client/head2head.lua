@@ -179,9 +179,11 @@ local function isPlayerNearby(playerCoords, otherPlayerCoords, maxDistance)
 end
 
 local function inviteNearbyPlayers(raceId, amount)
+
+    DebugLog('[H2H] Inviting nearby players', raceId, amount)
+
     local playerPed = PlayerPedId()
     local playerCoords = GetEntityCoords(playerPed)
-    local vehicle = GetVehiclePedIsIn(playerPed, false)
 
     local nearbyPlayersFound = false
     for _, playerId in ipairs(GetActivePlayers()) do
@@ -307,7 +309,7 @@ local function setupHead2Head(data)
         local coord = Citizen.InvokeNative( 0xFA7C7F0AADF25D09, waypointBlip, Citizen.ResultAsVector( ) )
         finishCoords = vector3(coord.x,coord.y,coord.z)
     end
-    TriggerServerEvent('cw-racingapp:h2h:server:setupRace', citizenId, racerName, startCoords, amount, 'head2head', finishCoords)
+    TriggerServerEvent('cw-racingapp:h2h:server:setupRace', startCoords, amount)
     handleHighBeams()
 end
 
