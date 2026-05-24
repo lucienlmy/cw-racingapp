@@ -88,8 +88,12 @@ local function changeRaceUser(citizenId, racerName)
 end
 
 local function getActiveRacerName(citizenId)
+    if not citizenId then
+        print('^1[ERROR][cw-racingapp] getActiveRacerName: citizenId is nil^0')
+        return nil
+    end
     dbLog('getActiveRacerName | citizenId: ' .. tostring(citizenId))
-    return MySQL.Sync.fetchAll('SELECT * FROM racer_names WHERE citizenid = ?', { citizenId })[1]
+    return MySQL.Sync.fetchAll('SELECT * FROM racer_names WHERE citizenid = ? AND active = 1', { citizenId })[1]
 end
 
 local function getActiveRacerCrew(racerName)
